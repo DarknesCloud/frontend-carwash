@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useState } from 'react';
 import {
@@ -14,7 +15,11 @@ import {
   Snackbar,
 } from '@mui/material';
 import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+} from '@mui/icons-material';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Layout from '@/components/Layout';
 import api from '@/services/api';
@@ -26,11 +31,16 @@ interface VehicleTypeFormData {
 }
 
 export default function VehicleTypesPage() {
-  const [vehicleTypes, setVehicleTypes] = useState([]);
+  const [vehicleTypes, setVehicleTypes] = useState<any[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success' as 'success' | 'error',
+  });
 
   const { control, handleSubmit, reset } = useForm<VehicleTypeFormData>({
     defaultValues: {
@@ -80,15 +90,27 @@ export default function VehicleTypesPage() {
     try {
       if (editingId) {
         await api.updateVehicleType(editingId, data);
-        setSnackbar({ open: true, message: 'Tipo de vehículo actualizado exitosamente', severity: 'success' });
+        setSnackbar({
+          open: true,
+          message: 'Tipo de vehículo actualizado exitosamente',
+          severity: 'success',
+        });
       } else {
         await api.createVehicleType(data);
-        setSnackbar({ open: true, message: 'Tipo de vehículo creado exitosamente', severity: 'success' });
+        setSnackbar({
+          open: true,
+          message: 'Tipo de vehículo creado exitosamente',
+          severity: 'success',
+        });
       }
       handleCloseDialog();
       loadData();
     } catch (error: any) {
-      setSnackbar({ open: true, message: error.message || 'Error al guardar', severity: 'error' });
+      setSnackbar({
+        open: true,
+        message: error.message || 'Error al guardar',
+        severity: 'error',
+      });
     }
   };
 
@@ -96,10 +118,18 @@ export default function VehicleTypesPage() {
     if (confirm('¿Está seguro de eliminar este tipo de vehículo?')) {
       try {
         await api.deleteVehicleType(id);
-        setSnackbar({ open: true, message: 'Tipo de vehículo eliminado exitosamente', severity: 'success' });
+        setSnackbar({
+          open: true,
+          message: 'Tipo de vehículo eliminado exitosamente',
+          severity: 'success',
+        });
         loadData();
       } catch (error: any) {
-        setSnackbar({ open: true, message: error.message || 'Error al eliminar', severity: 'error' });
+        setSnackbar({
+          open: true,
+          message: error.message || 'Error al eliminar',
+          severity: 'error',
+        });
       }
     }
   };
@@ -133,7 +163,14 @@ export default function VehicleTypesPage() {
     <ProtectedRoute>
       <Layout>
         <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 3,
+            }}
+          >
             <Box>
               <Typography variant="h4" fontWeight={700} gutterBottom>
                 Tipos de Vehículos
@@ -142,7 +179,11 @@ export default function VehicleTypesPage() {
                 Gestión de categorías de vehículos
               </Typography>
             </Box>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenDialog()}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => handleOpenDialog()}
+            >
               Nuevo Tipo
             </Button>
           </Box>
@@ -160,8 +201,15 @@ export default function VehicleTypesPage() {
             />
           </Box>
 
-          <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-            <DialogTitle>{editingId ? 'Editar Tipo de Vehículo' : 'Nuevo Tipo de Vehículo'}</DialogTitle>
+          <Dialog
+            open={openDialog}
+            onClose={handleCloseDialog}
+            maxWidth="sm"
+            fullWidth
+          >
+            <DialogTitle>
+              {editingId ? 'Editar Tipo de Vehículo' : 'Nuevo Tipo de Vehículo'}
+            </DialogTitle>
             <form onSubmit={handleSubmit(onSubmit)}>
               <DialogContent>
                 <Controller
@@ -209,7 +257,10 @@ export default function VehicleTypesPage() {
             autoHideDuration={6000}
             onClose={() => setSnackbar({ ...snackbar, open: false })}
           >
-            <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+            <Alert
+              severity={snackbar.severity}
+              onClose={() => setSnackbar({ ...snackbar, open: false })}
+            >
               {snackbar.message}
             </Alert>
           </Snackbar>
@@ -218,4 +269,3 @@ export default function VehicleTypesPage() {
     </ProtectedRoute>
   );
 }
-

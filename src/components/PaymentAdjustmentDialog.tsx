@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useEffect } from 'react';
 import {
@@ -184,7 +185,11 @@ export default function PaymentAdjustmentDialog({
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
-                label={selectedType === 'deduction' ? 'Monto a Deducir ($)' : 'Monto ($)'}
+                label={
+                  selectedType === 'deduction'
+                    ? 'Monto a Deducir ($)'
+                    : 'Monto ($)'
+                }
                 type="number"
                 fullWidth
                 margin="normal"
@@ -242,8 +247,8 @@ export default function PaymentAdjustmentDialog({
 
           <Box sx={{ mt: 2, p: 2, bgcolor: 'info.lighter', borderRadius: 1 }}>
             <Typography variant="caption" color="text.secondary">
-              <strong>Nota:</strong> Los ajustes se aplicarán automáticamente en los cálculos de
-              pagos del período correspondiente.
+              <strong>Nota:</strong> Los ajustes se aplicarán automáticamente en
+              los cálculos de pagos del período correspondiente.
             </Typography>
           </Box>
         </DialogContent>
@@ -259,4 +264,3 @@ export default function PaymentAdjustmentDialog({
     </Dialog>
   );
 }
-

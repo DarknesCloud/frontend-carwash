@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useState } from 'react';
 import {
@@ -36,15 +37,21 @@ interface Service {
 }
 
 export default function VehiclesPage() {
-  const [vehicles, setVehicles] = useState([]);
-  const [vehicleTypes, setVehicleTypes] = useState([]);
-  const [serviceTypes, setServiceTypes] = useState([]);
-  const [employees, setEmployees] = useState([]);
+  const [vehicles, setVehicles] = useState<any[]>([]);
+
+  const [vehicleTypes, setVehicleTypes] = useState<any[]>([]);
+
+  const [serviceTypes, setServiceTypes] = useState<any[]>([]);
+
+  const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<any>(null);
   const [selectedServices, setSelectedServices] = useState<Service[]>([]);
-  const [currentService, setCurrentService] = useState({ serviceType: '', price: 0 });
+  const [currentService, setCurrentService] = useState({
+    serviceType: '',
+    price: 0,
+  });
 
   const { control, handleSubmit, reset, setValue } = useForm({
     defaultValues: {
@@ -66,12 +73,13 @@ export default function VehiclesPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [vehiclesRes, vehicleTypesRes, serviceTypesRes, employeesRes] = await Promise.all([
-        api.getVehicles(),
-        api.getVehicleTypes(),
-        api.getServiceTypes(),
-        api.getEmployees(),
-      ]);
+      const [vehiclesRes, vehicleTypesRes, serviceTypesRes, employeesRes] =
+        await Promise.all([
+          api.getVehicles(),
+          api.getVehicleTypes(),
+          api.getServiceTypes(),
+          api.getEmployees(),
+        ]);
       setVehicles(vehiclesRes.data);
       setVehicleTypes(vehicleTypesRes.data);
       setServiceTypes(serviceTypesRes.data);
@@ -95,7 +103,9 @@ export default function VehiclesPage() {
   };
 
   const handleServiceTypeChange = (serviceTypeId: string) => {
-    const serviceType = serviceTypes.find((st: any) => st._id === serviceTypeId);
+    const serviceType = serviceTypes.find(
+      (st: any) => st._id === serviceTypeId
+    );
     if (serviceType) {
       setCurrentService({
         serviceType: serviceTypeId,
@@ -255,7 +265,11 @@ export default function VehiclesPage() {
           <IconButton size="small" onClick={() => handleEdit(params.row)}>
             <EditIcon />
           </IconButton>
-          <IconButton size="small" color="error" onClick={() => handleDelete(params.row._id)}>
+          <IconButton
+            size="small"
+            color="error"
+            onClick={() => handleDelete(params.row._id)}
+          >
             <DeleteIcon />
           </IconButton>
         </Box>
@@ -267,7 +281,14 @@ export default function VehiclesPage() {
     <ProtectedRoute>
       <Layout>
         <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 3,
+            }}
+          >
             <Box>
               <Typography variant="h4" fontWeight={700} gutterBottom>
                 Vehículos
@@ -298,7 +319,12 @@ export default function VehiclesPage() {
             />
           </Box>
 
-          <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+          <Dialog
+            open={openDialog}
+            onClose={handleCloseDialog}
+            maxWidth="md"
+            fullWidth
+          >
             <DialogTitle>
               {editingVehicle ? 'Editar Registro' : 'Nuevo Registro de Lavado'}
             </DialogTitle>
@@ -320,21 +346,33 @@ export default function VehiclesPage() {
                     )}
                   />
 
-                  <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2 }}>
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr 1fr',
+                      gap: 2,
+                    }}
+                  >
                     <Controller
                       name="brand"
                       control={control}
-                      render={({ field }) => <TextField {...field} label="Marca" fullWidth />}
+                      render={({ field }) => (
+                        <TextField {...field} label="Marca" fullWidth />
+                      )}
                     />
                     <Controller
                       name="model"
                       control={control}
-                      render={({ field }) => <TextField {...field} label="Modelo" fullWidth />}
+                      render={({ field }) => (
+                        <TextField {...field} label="Modelo" fullWidth />
+                      )}
                     />
                     <Controller
                       name="color"
                       control={control}
-                      render={({ field }) => <TextField {...field} label="Color" fullWidth />}
+                      render={({ field }) => (
+                        <TextField {...field} label="Color" fullWidth />
+                      )}
                     />
                   </Box>
 
@@ -365,13 +403,15 @@ export default function VehiclesPage() {
                       <Typography variant="h6" gutterBottom>
                         Servicios
                       </Typography>
-                      
+
                       <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                         <TextField
                           select
                           label="Tipo de Servicio"
                           value={currentService.serviceType}
-                          onChange={(e) => handleServiceTypeChange(e.target.value)}
+                          onChange={(e) =>
+                            handleServiceTypeChange(e.target.value)
+                          }
                           fullWidth
                         >
                           {serviceTypes.map((service: any) => (
@@ -385,14 +425,20 @@ export default function VehiclesPage() {
                           type="number"
                           value={currentService.price}
                           onChange={(e) =>
-                            setCurrentService({ ...currentService, price: Number(e.target.value) })
+                            setCurrentService({
+                              ...currentService,
+                              price: Number(e.target.value),
+                            })
                           }
                           fullWidth
                         />
                         <Button
                           variant="contained"
                           onClick={handleAddService}
-                          disabled={!currentService.serviceType || currentService.price <= 0}
+                          disabled={
+                            !currentService.serviceType ||
+                            currentService.price <= 0
+                          }
                         >
                           Agregar
                         </Button>
@@ -404,7 +450,9 @@ export default function VehiclesPage() {
                             Servicios seleccionados:
                           </Typography>
                           {selectedServices.map((service, index) => {
-                            const serviceType = serviceTypes.find((st: any) => st._id === service.serviceType);
+                            const serviceType = serviceTypes.find(
+                              (st: any) => st._id === service.serviceType
+                            );
                             return (
                               <Box
                                 key={index}
@@ -421,7 +469,10 @@ export default function VehiclesPage() {
                                 <Typography>
                                   {serviceType?.name} - ${service.price}
                                 </Typography>
-                                <IconButton size="small" onClick={() => handleRemoveService(index)}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleRemoveService(index)}
+                                >
                                   <RemoveIcon />
                                 </IconButton>
                               </Box>
@@ -461,7 +512,12 @@ export default function VehiclesPage() {
                     name="paymentStatus"
                     control={control}
                     render={({ field }) => (
-                      <TextField {...field} select label="Estado de Pago" fullWidth>
+                      <TextField
+                        {...field}
+                        select
+                        label="Estado de Pago"
+                        fullWidth
+                      >
                         <MenuItem value="pending">Pendiente</MenuItem>
                         <MenuItem value="paid">Pagado</MenuItem>
                       </TextField>
@@ -472,7 +528,12 @@ export default function VehiclesPage() {
                     name="entryTime"
                     control={control}
                     render={({ field }) => (
-                      <TextField {...field} label="Fecha y Hora" type="datetime-local" fullWidth />
+                      <TextField
+                        {...field}
+                        label="Fecha y Hora"
+                        type="datetime-local"
+                        fullWidth
+                      />
                     )}
                   />
                 </Box>
@@ -490,4 +551,3 @@ export default function VehiclesPage() {
     </ProtectedRoute>
   );
 }
-

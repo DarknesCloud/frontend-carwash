@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 class ApiClient {
@@ -7,21 +8,43 @@ class ApiClient {
     this.baseURL = baseURL;
   }
 
+  // ===============================
+  // 🔐 TOKEN MANAGEMENT
+  // ===============================
+  getToken(): string | null {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('token');
+    }
+    return null;
+  }
+
+  setToken(token: string | null) {
+    if (typeof window !== 'undefined') {
+      if (token) {
+        localStorage.setItem('token', token);
+      } else {
+        localStorage.removeItem('token');
+      }
+    }
+  }
+
+  // ===============================
+  // 🔧 REQUEST HANDLER
+  // ===============================
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const headers: HeadersInit = {
+    // Headers tipados correctamente
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...(options.headers as Record<string, string>),
     };
 
-    // 🔐 Agregar token JWT si existe en localStorage
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
+    // Agregar token si existe
+    const token = this.getToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
 
     const config: RequestInit = {
@@ -32,11 +55,9 @@ class ApiClient {
     try {
       const response = await fetch(`${this.baseURL}${endpoint}`, config);
 
-      // Detectar si la respuesta es JSON
       const contentType = response.headers.get('content-type');
       const isJson = contentType && contentType.includes('application/json');
 
-      // Manejo de errores HTTP
       if (!response.ok) {
         let errorMessage = `Error ${response.status}`;
         if (isJson) {
@@ -46,7 +67,6 @@ class ApiClient {
         throw new Error(errorMessage);
       }
 
-      // Retornar respuesta JSON solo si aplica
       if (isJson) {
         return (await response.json()) as T;
       }
@@ -62,7 +82,7 @@ class ApiClient {
   }
 
   // ===============================
-  // 🔐 AUTH
+  // 🔐 AUTH METHODS
   // ===============================
   async login(email: string, password: string) {
     const response = await this.request<{
@@ -74,11 +94,10 @@ class ApiClient {
       body: JSON.stringify({ email, password }),
     });
 
-    // 💾 Guardar usuario y token si existen
     if (typeof window !== 'undefined' && response?.user) {
       localStorage.setItem('user', JSON.stringify(response.user));
       if (response.token) {
-        localStorage.setItem('token', response.token);
+        this.setToken(response.token);
       }
     }
 
@@ -93,7 +112,7 @@ class ApiClient {
     }
     if (typeof window !== 'undefined') {
       localStorage.removeItem('user');
-      localStorage.removeItem('token');
+      this.setToken(null);
     }
   }
 
@@ -156,7 +175,9 @@ class ApiClient {
   async deleteVehicle(id: string) {
     return this.request<{ success: boolean; message: string }>(
       `/vehicles/${id}`,
-      { method: 'DELETE' }
+      {
+        method: 'DELETE',
+      }
     );
   }
 
@@ -179,10 +200,7 @@ class ApiClient {
   async updateVehicleType(id: string, data: any) {
     return this.request<{ success: boolean; data: any }>(
       `/vehicle-types/${id}`,
-      {
-        method: 'PUT',
-        body: JSON.stringify(data),
-      }
+      { method: 'PUT', body: JSON.stringify(data) }
     );
   }
 
@@ -212,10 +230,7 @@ class ApiClient {
   async updateServiceType(id: string, data: any) {
     return this.request<{ success: boolean; data: any }>(
       `/service-types/${id}`,
-      {
-        method: 'PUT',
-        body: JSON.stringify(data),
-      }
+      { method: 'PUT', body: JSON.stringify(data) }
     );
   }
 
@@ -252,7 +267,9 @@ class ApiClient {
   async deleteEmployee(id: string) {
     return this.request<{ success: boolean; message: string }>(
       `/employees/${id}`,
-      { method: 'DELETE' }
+      {
+        method: 'DELETE',
+      }
     );
   }
 
@@ -298,7 +315,9 @@ class ApiClient {
   async deletePayment(id: string) {
     return this.request<{ success: boolean; message: string }>(
       `/payments/${id}`,
-      { method: 'DELETE' }
+      {
+        method: 'DELETE',
+      }
     );
   }
 
@@ -339,7 +358,9 @@ class ApiClient {
   async deleteAdjustment(id: string) {
     return this.request<{ success: boolean; message: string }>(
       `/adjustments/${id}`,
-      { method: 'DELETE' }
+      {
+        method: 'DELETE',
+      }
     );
   }
 
@@ -369,11 +390,9 @@ class ApiClient {
     const queryString = params
       ? '?' + new URLSearchParams(params as any).toString()
       : '';
-    return this.request<{
-      success: boolean;
-      summary: any;
-      data: any[];
-    }>(`/reports/vehicles${queryString}`);
+    return this.request<{ success: boolean; summary: any; data: any[] }>(
+      `/reports/vehicles${queryString}`
+    );
   }
 
   async getDashboardStats() {

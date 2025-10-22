@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useState } from 'react';
 import {
@@ -17,7 +18,11 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+} from '@mui/icons-material';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Layout from '@/components/Layout';
 import api from '@/services/api';
@@ -32,11 +37,15 @@ interface EmployeeFormData {
 }
 
 export default function EmployeesPage() {
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success' as 'success' | 'error',
+  });
 
   const { control, handleSubmit, reset } = useForm<EmployeeFormData>({
     defaultValues: {
@@ -95,15 +104,27 @@ export default function EmployeesPage() {
     try {
       if (editingId) {
         await api.updateEmployee(editingId, data);
-        setSnackbar({ open: true, message: 'Empleado actualizado exitosamente', severity: 'success' });
+        setSnackbar({
+          open: true,
+          message: 'Empleado actualizado exitosamente',
+          severity: 'success',
+        });
       } else {
         await api.createEmployee(data);
-        setSnackbar({ open: true, message: 'Empleado creado exitosamente', severity: 'success' });
+        setSnackbar({
+          open: true,
+          message: 'Empleado creado exitosamente',
+          severity: 'success',
+        });
       }
       handleCloseDialog();
       loadData();
     } catch (error: any) {
-      setSnackbar({ open: true, message: error.message || 'Error al guardar', severity: 'error' });
+      setSnackbar({
+        open: true,
+        message: error.message || 'Error al guardar',
+        severity: 'error',
+      });
     }
   };
 
@@ -111,10 +132,18 @@ export default function EmployeesPage() {
     if (confirm('¿Está seguro de eliminar este empleado?')) {
       try {
         await api.deleteEmployee(id);
-        setSnackbar({ open: true, message: 'Empleado eliminado exitosamente', severity: 'success' });
+        setSnackbar({
+          open: true,
+          message: 'Empleado eliminado exitosamente',
+          severity: 'success',
+        });
         loadData();
       } catch (error: any) {
-        setSnackbar({ open: true, message: error.message || 'Error al eliminar', severity: 'error' });
+        setSnackbar({
+          open: true,
+          message: error.message || 'Error al eliminar',
+          severity: 'error',
+        });
       }
     }
   };
@@ -161,7 +190,14 @@ export default function EmployeesPage() {
     <ProtectedRoute>
       <Layout>
         <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 3,
+            }}
+          >
             <Box>
               <Typography variant="h4" fontWeight={700} gutterBottom>
                 Empleados
@@ -170,7 +206,11 @@ export default function EmployeesPage() {
                 Gestión de lavadores y personal
               </Typography>
             </Box>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenDialog()}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => handleOpenDialog()}
+            >
               Nuevo Empleado
             </Button>
           </Box>
@@ -188,8 +228,15 @@ export default function EmployeesPage() {
             />
           </Box>
 
-          <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-            <DialogTitle>{editingId ? 'Editar Empleado' : 'Nuevo Empleado'}</DialogTitle>
+          <Dialog
+            open={openDialog}
+            onClose={handleCloseDialog}
+            maxWidth="sm"
+            fullWidth
+          >
+            <DialogTitle>
+              {editingId ? 'Editar Empleado' : 'Nuevo Empleado'}
+            </DialogTitle>
             <form onSubmit={handleSubmit(onSubmit)}>
               <DialogContent>
                 <Controller
@@ -246,7 +293,10 @@ export default function EmployeesPage() {
                 <Controller
                   name="paymentPerService"
                   control={control}
-                  rules={{ required: 'El pago por servicio es requerido', min: { value: 0, message: 'Debe ser un número positivo' } }}
+                  rules={{
+                    required: 'El pago por servicio es requerido',
+                    min: { value: 0, message: 'Debe ser un número positivo' },
+                  }}
                   render={({ field, fieldState }) => (
                     <TextField
                       {...field}
@@ -257,7 +307,9 @@ export default function EmployeesPage() {
                       required
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                      onChange={(e) =>
+                        field.onChange(parseFloat(e.target.value))
+                      }
                     />
                   )}
                 />
@@ -287,7 +339,10 @@ export default function EmployeesPage() {
             autoHideDuration={6000}
             onClose={() => setSnackbar({ ...snackbar, open: false })}
           >
-            <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+            <Alert
+              severity={snackbar.severity}
+              onClose={() => setSnackbar({ ...snackbar, open: false })}
+            >
               {snackbar.message}
             </Alert>
           </Snackbar>
@@ -296,4 +351,3 @@ export default function EmployeesPage() {
     </ProtectedRoute>
   );
 }
-
