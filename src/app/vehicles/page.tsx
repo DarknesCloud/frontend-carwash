@@ -62,6 +62,7 @@ export default function VehiclesPage() {
       vehicleType: '',
       employee: '',
       paymentStatus: 'pending',
+      paymentMethod: 'efectivo',
       entryTime: new Date().toISOString().slice(0, 16),
     },
   });
@@ -154,6 +155,7 @@ export default function VehiclesPage() {
       vehicleType: vehicle.vehicleType._id,
       employee: vehicle.employee._id,
       paymentStatus: vehicle.paymentStatus,
+      paymentMethod: vehicle.paymentMethod || 'efectivo',
       entryTime: new Date(vehicle.entryTime).toISOString().slice(0, 16),
     });
     setSelectedServices(vehicle.services || []);
@@ -237,6 +239,19 @@ export default function VehiclesPage() {
           label={params.value === 'paid' ? 'Pagado' : 'Pendiente'}
           color={params.value === 'paid' ? 'success' : 'warning'}
           size="small"
+        />
+      ),
+    },
+    {
+      field: 'paymentMethod',
+      headerName: 'Método',
+      width: 120,
+      renderCell: (params: any) => (
+        <Chip
+          label={params.value === 'efectivo' ? 'Efectivo' : 'Transferencia'}
+          color={params.value === 'efectivo' ? 'success' : 'info'}
+          size="small"
+          variant="outlined"
         />
       ),
     },
@@ -520,6 +535,22 @@ export default function VehiclesPage() {
                       >
                         <MenuItem value="pending">Pendiente</MenuItem>
                         <MenuItem value="paid">Pagado</MenuItem>
+                      </TextField>
+                    )}
+                  />
+
+                  <Controller
+                    name="paymentMethod"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        select
+                        label="Método de Pago"
+                        fullWidth
+                      >
+                        <MenuItem value="efectivo">Efectivo</MenuItem>
+                        <MenuItem value="transferencia">Transferencia</MenuItem>
                       </TextField>
                     )}
                   />

@@ -158,10 +158,16 @@ export default function ReportsPage() {
       valueGetter: (params: any) => params?.name || '',
     },
     {
-      field: 'serviceType',
-      headerName: 'Tipo de Servicio',
-      width: 150,
-      valueGetter: (params: any) => params?.name || '',
+      field: 'services',
+      headerName: 'Servicios',
+      width: 200,
+      renderCell: (params: any) => (
+        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+          {params.row.services?.map((service: any, index: number) => (
+            service.serviceType?.name || 'N/A'
+          )).join(', ')}
+        </Box>
+      ),
     },
     {
       field: 'employee',
@@ -170,10 +176,16 @@ export default function ReportsPage() {
       valueGetter: (params: any) => params?.name || '',
     },
     {
-      field: 'price',
-      headerName: 'Precio',
-      width: 100,
+      field: 'totalPrice',
+      headerName: 'Precio Total',
+      width: 120,
       valueFormatter: (params: any) => `$${params}`,
+    },
+    {
+      field: 'paymentMethod',
+      headerName: 'Método de Pago',
+      width: 130,
+      valueFormatter: (params: any) => params === 'efectivo' ? 'Efectivo' : 'Transferencia',
     },
     {
       field: 'entryTime',
@@ -358,47 +370,77 @@ export default function ReportsPage() {
               </Box>
 
               {vehicleSummary && (
-                <Grid container spacing={2} sx={{ mb: 2 }}>
-                  {/*@ts-expect-error - TypeScript doesn't recognize custom prop */}
-                  <Grid item xs={12} sm={4}>
-                    <Card>
-                      <CardContent>
-                        <Typography color="text.secondary" gutterBottom>
-                          Total de Registros
-                        </Typography>
-                        <Typography variant="h4" fontWeight={700}>
-                          {vehicleSummary.totalRecords}
-                        </Typography>
-                      </CardContent>
-                    </Card>
+                <>
+                  <Grid container spacing={2} sx={{ mb: 2 }}>
+                    {/*@ts-expect-error - TypeScript doesn't recognize custom prop */}
+                    <Grid item xs={12} sm={4}>
+                      <Card>
+                        <CardContent>
+                          <Typography color="text.secondary" gutterBottom>
+                            Total de Registros
+                          </Typography>
+                          <Typography variant="h4" fontWeight={700}>
+                            {vehicleSummary.totalRecords}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                    {/*@ts-expect-error - TypeScript doesn't recognize custom prop */}
+                    <Grid item xs={12} sm={4}>
+                      <Card>
+                        <CardContent>
+                          <Typography color="text.secondary" gutterBottom>
+                            Ingresos Totales
+                          </Typography>
+                          <Typography variant="h4" fontWeight={700}>
+                            ${vehicleSummary.totalRevenue}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                    {/*@ts-expect-error - TypeScript doesn't recognize custom prop */}
+                    <Grid item xs={12} sm={4}>
+                      <Card>
+                        <CardContent>
+                          <Typography color="text.secondary" gutterBottom>
+                            Precio Promedio
+                          </Typography>
+                          <Typography variant="h4" fontWeight={700}>
+                            ${vehicleSummary.averagePrice}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
                   </Grid>
-                  {/*@ts-expect-error - TypeScript doesn't recognize custom prop */}
-                  <Grid item xs={12} sm={4}>
-                    <Card>
-                      <CardContent>
-                        <Typography color="text.secondary" gutterBottom>
-                          Ingresos Totales
-                        </Typography>
-                        <Typography variant="h4" fontWeight={700}>
-                          ${vehicleSummary.totalRevenue}
-                        </Typography>
-                      </CardContent>
-                    </Card>
+                  <Grid container spacing={2} sx={{ mb: 2 }}>
+                    {/*@ts-expect-error - TypeScript doesn't recognize custom prop */}
+                    <Grid item xs={12} sm={6}>
+                      <Card sx={{ bgcolor: 'success.light' }}>
+                        <CardContent>
+                          <Typography color="text.secondary" gutterBottom>
+                            Efectivo
+                          </Typography>
+                          <Typography variant="h5" fontWeight={700}>
+                            {vehicleSummary.efectivo?.count || 0} lavados - ${vehicleSummary.efectivo?.revenue || 0}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                    {/*@ts-expect-error - TypeScript doesn't recognize custom prop */}
+                    <Grid item xs={12} sm={6}>
+                      <Card sx={{ bgcolor: 'info.light' }}>
+                        <CardContent>
+                          <Typography color="text.secondary" gutterBottom>
+                            Transferencia
+                          </Typography>
+                          <Typography variant="h5" fontWeight={700}>
+                            {vehicleSummary.transferencia?.count || 0} lavados - ${vehicleSummary.transferencia?.revenue || 0}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
                   </Grid>
-                  {/*@ts-expect-error - TypeScript doesn't recognize custom prop */}
-                  <Grid item xs={12} sm={4}>
-                    <Card>
-                      <CardContent>
-                        <Typography color="text.secondary" gutterBottom>
-                          Precio Promedio
-                        </Typography>
-                        <Typography variant="h4" fontWeight={700}>
-                          ${vehicleSummary.averagePrice}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                </Grid>
+                </>
               )}
 
               <Box sx={{ height: 600, bgcolor: 'white', borderRadius: 2 }}>
