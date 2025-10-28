@@ -3,31 +3,33 @@
  */
 
 /**
- * Convierte una fecha UTC a la zona horaria local y la formatea
+ * Convierte una fecha UTC a la zona horaria local de Honduras y la formatea
  * @param dateString - Fecha en formato ISO string
  * @param includeTime - Si se debe incluir la hora en el formato
- * @returns Fecha formateada en zona horaria local
+ * @returns Fecha formateada en zona horaria de Honduras
  */
-export const formatLocalDate = (dateString: string, includeTime: boolean = false): string => {
+export const formatLocalDate = (
+  dateString: string,
+  includeTime: boolean = false
+): string => {
   if (!dateString) return '';
-  
+
   const date = new Date(dateString);
-  
-  if (includeTime) {
-    return date.toLocaleString('es-ES', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  }
-  
-  return date.toLocaleDateString('es-ES', {
+
+  // Usar zona horaria de Honduras
+  const options: Intl.DateTimeFormatOptions = {
+    timeZone: 'America/Tegucigalpa',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-  });
+  };
+
+  if (includeTime) {
+    options.hour = '2-digit';
+    options.minute = '2-digit';
+  }
+
+  return date.toLocaleString('es-ES', options);
 };
 
 /**
@@ -37,11 +39,11 @@ export const formatLocalDate = (dateString: string, includeTime: boolean = false
  */
 export const toISODate = (dateString: string): string => {
   if (!dateString) return '';
-  
+
   // Crear fecha en zona horaria local
   const [year, month, day] = dateString.split('-').map(Number);
   const date = new Date(year, month - 1, day);
-  
+
   return date.toISOString();
 };
 
@@ -54,46 +56,68 @@ export const getTodayString = (): string => {
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, '0');
   const day = String(today.getDate()).padStart(2, '0');
-  
+
   return `${year}-${month}-${day}`;
 };
 
 /**
- * Convierte una fecha UTC a formato YYYY-MM-DD en zona horaria local
+ * Convierte una fecha UTC a formato YYYY-MM-DD en zona horaria de Honduras
  * @param dateString - Fecha en formato ISO string
  * @returns Fecha en formato YYYY-MM-DD
  */
 export const toLocalDateString = (dateString: string): string => {
   if (!dateString) return '';
-  
+
   const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  
-  return `${year}-${month}-${day}`;
+
+  // Usar zona horaria de Honduras
+  const options: Intl.DateTimeFormatOptions = {
+    timeZone: 'America/Tegucigalpa',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  };
+
+  const formattedDate = date.toLocaleDateString('es-ES', options);
+  return formattedDate; // Devuelve fecha en formato 'YYYY-MM-DD'
 };
 
 /**
- * Calcula el inicio del día en zona horaria local
+ * Calcula el inicio del día en zona horaria de Honduras
  * @param dateString - Fecha en formato YYYY-MM-DD
  * @returns Fecha ISO del inicio del día
  */
 export const getStartOfDay = (dateString: string): string => {
   const [year, month, day] = dateString.split('-').map(Number);
   const date = new Date(year, month - 1, day, 0, 0, 0, 0);
-  return date.toISOString();
+
+  // Ajustar al inicio del día en zona horaria de Honduras
+  const options: Intl.DateTimeFormatOptions = {
+    timeZone: 'America/Tegucigalpa',
+  };
+
+  const startOfDay = date.toLocaleString('es-ES', options);
+
+  return new Date(startOfDay).toISOString(); // Regresa como ISO
 };
 
 /**
- * Calcula el fin del día en zona horaria local
+ * Calcula el fin del día en zona horaria de Honduras
  * @param dateString - Fecha en formato YYYY-MM-DD
  * @returns Fecha ISO del fin del día
  */
 export const getEndOfDay = (dateString: string): string => {
   const [year, month, day] = dateString.split('-').map(Number);
   const date = new Date(year, month - 1, day, 23, 59, 59, 999);
-  return date.toISOString();
+
+  // Ajustar al fin del día en zona horaria de Honduras
+  const options: Intl.DateTimeFormatOptions = {
+    timeZone: 'America/Tegucigalpa',
+  };
+
+  const endOfDay = date.toLocaleString('es-ES', options);
+
+  return new Date(endOfDay).toISOString(); // Regresa como ISO
 };
 
 /**
@@ -114,11 +138,13 @@ export const formatCurrency = (amount: number): string => {
  * @param endDate - Fecha de fin
  * @returns Número de días de diferencia
  */
-export const getDaysDifference = (startDate: string, endDate: string): number => {
+export const getDaysDifference = (
+  startDate: string,
+  endDate: string
+): number => {
   const start = new Date(startDate);
   const end = new Date(endDate);
   const diffTime = Math.abs(end.getTime() - start.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays;
 };
-
